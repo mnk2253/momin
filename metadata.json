@@ -1,0 +1,7 @@
+{
+  "name": "Sinthiya Telecom - Daily Hisab",
+  "description": "A comprehensive daily accounting and management system for telecom businesses, tracking accounts, customer dues, stock, and expenses.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
