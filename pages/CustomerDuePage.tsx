@@ -332,13 +332,11 @@ const CustomerDuePage: React.FC = () => {
     doc.text("Sinthiya Telecom", 14, 20);
 
     doc.setFontSize(10); doc.setTextColor(50); doc.setFont("helvetica", "bold"); 
-    doc.text("owner:Md. Abdul Momin", 14, 34);
+    doc.text("owner:Md. Abdul Momin", 14, 27);
 
     doc.setFontSize(10); doc.setTextColor(50); doc.setFont("helvetica", "normal"); 
-    doc.text("Contact: 01307085310", 14, 41);
+    doc.text("Contact: 01307085310", 14, 33);
     
-    doc.setFontSize(10); doc.setTextColor(50); doc.setFont("helvetica", "normal"); 
-    doc.text("Sirajganj, Bangladesh", 14, 48);
     
     // Customer Image (If available)
     if (customer.imageUrl && customer.imageUrl.startsWith('data:image')) {
