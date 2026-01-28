@@ -137,7 +137,7 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
                 {currentUser?.displayName || 'Abdul Momin'}
               </p>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mt-1">
-                {currentUser?.email}
+                {currentUser?.displayName ? 'User Account' : 'Owner & CEO'}
               </p>
             </div>
             <div className="w-12 h-12 rounded-2xl bg-indigo-50 border-2 border-white shadow-sm flex items-center justify-center text-indigo-600 group-hover:bg-indigo-600 group-hover:text-white transition-all">
