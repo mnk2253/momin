@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import { History as HistoryIcon, Search, ChevronDown, Loader2, Folder, Clock, TrendingUp, TrendingDown, Calculator, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { History as HistoryIcon, Search, ChevronDown, Loader2, Folder, Clock, TrendingUp, TrendingDown, Calculator, ArrowUpRight, ArrowDownRight, MinusCircle } from 'lucide-react';
 // Redirected modular imports to local wrappers in firebase.ts
 import { collection, onSnapshot, query, orderBy, db } from '../firebase';
 import { HistoryRecord, AccountProvider, ProviderClosing } from '../types';
@@ -9,6 +9,8 @@ import { ACCOUNT_PROVIDERS } from '../constants';
 interface DailyHisab {
   pastCash: number;
   mainCash: number;
+  totalLoan?: number;
+  totalBalance?: number;
   profitLoss: number;
   date: string;
 }
@@ -226,13 +228,21 @@ const HistoryPage: React.FC = () => {
                            <Calculator size={18} className="text-indigo-600" />
                            <h5 className="text-[11px] font-black text-slate-900 uppercase tracking-widest">Financial Summary (Opening & Closing)</h5>
                         </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                           <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between">
                             <div>
                               <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Past Cash (Opening)</p>
                               <p className="text-xl font-black text-slate-800">৳{(dayGroup.hisab.pastCash || 0).toLocaleString()}</p>
                             </div>
                             <div className="w-10 h-10 bg-slate-50 text-slate-400 rounded-xl flex items-center justify-center"><Clock size={20} /></div>
+                          </div>
+
+                          <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between">
+                            <div>
+                              <p className="text-[9px] font-black text-slate-400 uppercase mb-1">Total Loan (Debt)</p>
+                              <p className="text-xl font-black text-rose-500">৳{(dayGroup.hisab.totalLoan || 0).toLocaleString()}</p>
+                            </div>
+                            <div className="w-10 h-10 bg-rose-50 text-rose-400 rounded-xl flex items-center justify-center"><MinusCircle size={20} /></div>
                           </div>
                           
                           <div className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex items-center justify-between">

@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Search, Wallet, Landmark, Trash2, Edit2, Loader2, X, CheckCircle2, Save, Zap } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Plus, Search, Wallet, Landmark, Trash2, Edit2, Loader2, X, CheckCircle2, Save, Zap, Activity, Calculator } from 'lucide-react';
 // Redirected modular imports to local wrappers in firebase.ts
 import { 
   collection, 
@@ -51,6 +51,26 @@ const AccountPage: React.FC = () => {
 
     return () => unsubscribe();
   }, []);
+
+  // Calculate Totals by Provider
+  const walletStats = useMemo(() => {
+    const stats: Record<string, number> = {
+      bkash: 0,
+      nagad: 0,
+      rocket: 0,
+      flexiload: 0,
+      hand_cash: 0,
+      grandTotal: 0
+    };
+
+    accounts.forEach(acc => {
+      const bal = Number(acc.balance) || 0;
+      stats[acc.provider] = (stats[acc.provider] || 0) + bal;
+      stats.grandTotal += bal;
+    });
+
+    return stats;
+  }, [accounts]);
 
   const handleOpenClosingModal = (provider: AccountProvider) => {
     const providerAccounts = accounts.filter(a => a.provider === provider);
@@ -257,7 +277,30 @@ const AccountPage: React.FC = () => {
   const filteredAccounts = accounts.filter(a => a.number.includes(searchTerm) || a.provider.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
-    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500">
+    <div className="space-y-6 animate-in fade-in slide-in-from-bottom-2 duration-500 pb-20">
+      
+      {/* Top Summaries Grid */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-4">
+        {ACCOUNT_PROVIDERS.map(p => (
+           <div key={p.id} className="bg-white p-5 rounded-[2rem] border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center group hover:shadow-md transition-all">
+              <div className={`w-12 h-12 rounded-xl flex items-center justify-center mb-3 shadow-lg ${p.color} text-white group-hover:scale-110 transition-transform`}>
+                <img src={p.logo} alt={p.name} className="w-8 h-8 object-contain rounded-lg" />
+              </div>
+              <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest mb-1">{p.name}</p>
+              <p className="text-sm font-black text-slate-900 tracking-tight">৳{(walletStats[p.id] || 0).toLocaleString()}</p>
+           </div>
+        ))}
+
+        {/* Grand Total Highlight */}
+        <div className="col-span-2 md:col-span-3 lg:col-span-1 bg-slate-900 p-5 rounded-[2rem] border border-slate-800 shadow-xl flex flex-col items-center justify-center text-center relative overflow-hidden group">
+           <div className="absolute right-0 top-0 p-2 opacity-5">
+             <Calculator size={40} className="text-white" />
+           </div>
+           <p className="text-[9px] font-black text-indigo-400 uppercase tracking-widest mb-1 relative z-10">Grand Total</p>
+           <p className="text-lg font-black text-white tracking-tighter relative z-10">৳{walletStats.grandTotal.toLocaleString()}</p>
+        </div>
+      </div>
+
       <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100">
         <div className="flex items-center space-x-4">
           <div className="bg-indigo-600 p-3 rounded-2xl text-white"><Landmark size={24} /></div>

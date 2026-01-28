@@ -1,6 +1,6 @@
 
-import React, { useState, useEffect, useRef } from 'react';
-import { Plus, Search, User, Users, MapPin, Phone, History, ArrowRightLeft, Loader2, Wallet, CheckCircle2, ChevronRight, X, UserPlus, Camera, Link as LinkIcon, Image as ImageIcon, Maximize2, Download, Edit2, Trash2, Calendar, FileText, DatabaseBackup, ClipboardPaste, Info, FileDown, RotateCcw, Upload, ZoomIn, MessageCircle } from 'lucide-react';
+import React, { useState, useEffect, useRef, useMemo } from 'react';
+import { Plus, Search, User, Users, MapPin, Phone, History, ArrowRightLeft, Loader2, Wallet, CheckCircle2, ChevronRight, X, UserPlus, Camera, Link as LinkIcon, ImageIcon, Maximize2, Download, Edit2, Trash2, Calendar, FileText, DatabaseBackup, ClipboardPaste, Info, FileDown, RotateCcw, Upload, ZoomIn, MessageCircle, TrendingUp, TrendingDown } from 'lucide-react';
 // Redirected modular imports to local wrappers in firebase.ts
 import { 
   collection, 
@@ -56,6 +56,20 @@ const CustomerDuePage: React.FC = () => {
     comment: '',
     date: new Date().toISOString().split('T')[0]
   });
+
+  // Calculate aggregated summaries
+  const totals = useMemo(() => {
+    let amiPabo = 0;
+    let amarThekePabe = 0;
+    customers.forEach(c => {
+      if (c.currentDue > 0) {
+        amiPabo += c.currentDue;
+      } else if (c.currentDue < 0) {
+        amarThekePabe += Math.abs(c.currentDue);
+      }
+    });
+    return { amiPabo, amarThekePabe };
+  }, [customers]);
 
   // Helper to generate WhatsApp URL
   const getWhatsAppUrl = (phoneNumber: string) => {
@@ -372,6 +386,31 @@ const CustomerDuePage: React.FC = () => {
 
   return (
     <div className="space-y-6 animate-in fade-in duration-500">
+      {/* Top Aggregated Summary */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="bg-emerald-50 p-8 rounded-[2.5rem] border border-emerald-100 flex items-center justify-between shadow-sm group hover:shadow-md transition-all">
+          <div>
+            <p className="text-[10px] text-emerald-600 font-black uppercase tracking-[0.2em] mb-1">আমি পাবো (Ami Pabo)</p>
+            <h3 className="text-3xl font-black text-emerald-700 tracking-tighter">৳{totals.amiPabo.toLocaleString()}</h3>
+            <p className="text-[10px] text-emerald-400 font-bold mt-1 uppercase">Total Positive Dues</p>
+          </div>
+          <div className="p-5 bg-emerald-600 text-white rounded-3xl shadow-lg shadow-emerald-100 group-hover:scale-110 transition-transform">
+             <TrendingUp size={28} />
+          </div>
+        </div>
+
+        <div className="bg-rose-50 p-8 rounded-[2.5rem] border border-rose-100 flex items-center justify-between shadow-sm group hover:shadow-md transition-all">
+          <div>
+            <p className="text-[10px] text-rose-600 font-black uppercase tracking-[0.2em] mb-1">আমার থেকে পাবে (Amar Theke Pabe)</p>
+            <h3 className="text-3xl font-black text-rose-700 tracking-tighter">৳{totals.amarThekePabe.toLocaleString()}</h3>
+            <p className="text-[10px] text-rose-400 font-bold mt-1 uppercase">Total Negative Balances</p>
+          </div>
+          <div className="p-5 bg-rose-600 text-white rounded-3xl shadow-lg shadow-rose-100 group-hover:scale-110 transition-transform">
+             <TrendingDown size={28} />
+          </div>
+        </div>
+      </div>
+
       {/* Header Actions */}
       <div className="bg-white p-6 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div className="flex items-center space-x-4">
@@ -437,7 +476,7 @@ const CustomerDuePage: React.FC = () => {
                       </a>
                     </div>
                   </td>
-                  <td className="px-8 py-6"><span className={`px-4 py-1.5 rounded-xl font-black text-sm ${customer.currentDue > 0 ? 'bg-rose-50 text-rose-600' : 'bg-emerald-50 text-emerald-600'}`}>৳{customer.currentDue.toLocaleString()}</span></td>
+                  <td className="px-8 py-6"><span className={`px-4 py-1.5 rounded-xl font-black text-sm ${customer.currentDue > 0 ? 'bg-rose-50 text-rose-600' : customer.currentDue < 0 ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-50 text-slate-400'}`}>৳{customer.currentDue.toLocaleString()}</span></td>
                   <td className="px-8 py-6 text-right">
                     <div className="flex justify-end items-center space-x-2">
                        <button onClick={() => handleOpenEditCustomer(customer)} title="Edit Customer" className="p-2.5 text-slate-400 hover:text-indigo-600 bg-slate-50 rounded-xl transition-all">
@@ -486,7 +525,7 @@ const CustomerDuePage: React.FC = () => {
             </div>
 
             <div className="px-8 py-6 bg-slate-50/50 flex flex-wrap items-center justify-between gap-4 shrink-0">
-              <div><p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Balance</p><p className={`text-3xl font-black ${selectedCustomer.currentDue > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>৳{selectedCustomer.currentDue.toLocaleString()}</p></div>
+              <div><p className="text-[10px] text-slate-400 font-black uppercase tracking-widest">Balance</p><p className={`text-3xl font-black ${selectedCustomer.currentDue > 0 ? 'text-rose-600' : selectedCustomer.currentDue < 0 ? 'text-emerald-600' : 'text-slate-400'}`}>৳{selectedCustomer.currentDue.toLocaleString()}</p></div>
               <div className="flex gap-2">
                 <button onClick={() => setIsLedgerImportOpen(true)} className="bg-emerald-50 text-emerald-600 px-6 py-4 rounded-2xl font-black text-[10px] uppercase hover:bg-emerald-100 transition-all flex items-center gap-2"><FileDown size={18} /><span>Import Ledger</span></button>
                 <button onClick={() => { setEditingTransactionId(null); setIsTransactionOpen(true); }} className="bg-indigo-600 text-white px-6 py-4 rounded-2xl font-black shadow-lg hover:bg-indigo-700 active:scale-95 flex items-center space-x-2"><Plus size={18} /><span>New Entry</span></button>

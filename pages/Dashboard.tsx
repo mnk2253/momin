@@ -127,11 +127,16 @@ const Dashboard: React.FC = () => {
       setStats(prev => ({ ...prev, marketDues: due, customerCount: snap.size }));
     });
 
-    // 3. Listen to Loans
+    // 3. Listen to Loans (Using "Close Due" logic)
     const unsubLoans = onSnapshot(collection(db, 'loans'), (snap) => {
-      let loan = 0;
-      snap.forEach(doc => loan += (doc.data().currentDue || 0));
-      setStats(prev => ({ ...prev, totalLoan: loan, loanCount: snap.size }));
+      let totalCloseDue = 0;
+      snap.forEach(doc => {
+        const data = doc.data();
+        // Calculation: Math.max(0, currentDue - totalSavings) matching LoanManagement page logic
+        const closeDue = Math.max(0, (data.currentDue || 0) - (data.totalSavings || 0));
+        totalCloseDue += closeDue;
+      });
+      setStats(prev => ({ ...prev, totalLoan: totalCloseDue, loanCount: snap.size }));
     });
 
     // 4. Listen to Products (Stock)
@@ -274,7 +279,7 @@ const Dashboard: React.FC = () => {
            </div>
            <h1 className="text-5xl font-black tracking-tighter leading-none">৳{(totalBalance || 0).toLocaleString()}</h1>
            <p className="text-slate-400 font-bold text-sm tracking-tight flex items-center">
-             Wallets (৳{(stats.walletBalance || 0).toLocaleString()}) + Dues (৳{(stats.marketDues || 0).toLocaleString()}) + Stock (৳{(stats.stockBalance || 0).toLocaleString()})
+             Wallets (৳{(stats.walletBalance || 0).toLocaleString()}) + Dues (৳{(stats.marketDues || 0).toLocaleString()}) + Stock (৳{(stats.stockBalance || 0).toLocaleString()}) - Loan (৳{(stats.totalLoan || 0).toLocaleString()})
            </p>
          </div>
          <div className="mt-8 md:mt-0 flex flex-col items-end gap-3 relative z-10">
@@ -300,7 +305,7 @@ const Dashboard: React.FC = () => {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
         <StatCard title="Wallet Balance" value={`৳${(stats.walletBalance || 0).toLocaleString()}`} subValue={`${stats.walletCount || 0} Wallets`} icon={Wallet} color="bg-indigo-600" trend="up" />
         <StatCard title="Market Dues" value={`৳${(stats.marketDues || 0).toLocaleString()}`} subValue={`${stats.customerCount || 0} Clients`} icon={Users} color="bg-orange-500" trend="down" />
-        <StatCard title="Total Loan" value={`৳${(stats.totalLoan || 0).toLocaleString()}`} subValue={`${stats.loanCount || 0} Profiles`} icon={HandCoins} color="bg-rose-600" trend="down" />
+        <StatCard title="Loan Close Due" value={`৳${(stats.totalLoan || 0).toLocaleString()}`} subValue={`${stats.loanCount || 0} Profiles`} icon={HandCoins} color="bg-rose-600" trend="down" />
         <StatCard title="Stock Balance" value={`৳${(stats.stockBalance || 0).toLocaleString()}`} subValue="Inventory Value" icon={Package} color="bg-amber-500" trend="up" />
       </div>
 
@@ -332,7 +337,7 @@ const Dashboard: React.FC = () => {
              <div className="flex items-center justify-between p-5 bg-rose-50/30 rounded-2xl border border-rose-100">
                 <div className="flex items-center space-x-3">
                    <div className="p-2 bg-rose-100 text-rose-600 rounded-lg"><Minus size={14} /></div>
-                   <p className="text-[11px] font-black text-slate-600 uppercase tracking-widest">Total Loan (Debt)</p>
+                   <p className="text-[11px] font-black text-slate-600 uppercase tracking-widest">Loan Close Due (Debt)</p>
                 </div>
                 <p className="text-xl font-black text-rose-600">- ৳{(stats.totalLoan || 0).toLocaleString()}</p>
              </div>
@@ -396,7 +401,7 @@ const Dashboard: React.FC = () => {
 
            <div className="text-[10px] text-slate-300 font-bold uppercase tracking-widest flex items-center justify-center pt-4">
               <History size={12} className="mr-2" />
-              Formula: (Total Cash - Total Loan) - Past Cash
+              Formula: (Total Cash - Loan Close Due) - Past Cash
            </div>
         </div>
 
