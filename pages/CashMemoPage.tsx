@@ -133,7 +133,7 @@ const translations = {
 };
 
 const numberToWordsBN = (num: number): string => {
-  const bnNumbers = ['শূন্য', 'এক', 'দুই', 'তিন', 'চার', 'পাঁচ', 'ছয়', 'সাত', 'আট', 'নয়', 'দশ', 'এগারো', 'বারো', 'তেরো', 'চৌদ্দ', 'পনেরো', 'ষোলো', 'সতেরো', 'আঠারো', 'উনিশ', 'বিশ', 'একুশ', 'বাইশ', 'তেইশ', 'চৌত্রিশ', 'পঁয়ত্রিশ', 'ছত্রিশ', 'সাঁয়ত্রিশ', 'আটত্রিশ', 'ঊনচল্লিশ', 'চল্লিশ', 'একচল্লিশ', 'বয়াল্লিশ', 'তেতাল্লিশ', 'চুয়াল্লিশ', 'পঁয়তাল্লিশ', 'ছেচল্লিশ', 'সাতচল্লিশ', 'আটচল্লিশ', 'ঊনপঞ্চাশ', 'পঞ্চাশ', 'একান্ন', 'বায়ান্ন', 'তিপ্পান্ন', 'চুয়ান্ন', 'পঞ্চান্ন', 'ছাপ্পান্ন', 'সাতান্ন', 'আটান্ন', 'ঊনষাট', 'ষাট', 'একষট্টি', 'বাষট্টি', 'তেষাটি', 'চৌষট্টি', 'পঁয়ষট্টি', 'ছেষট্টি', 'সাতষট্টি', 'আটষট্টি', 'ঊনসত্তর', 'সত্তর', 'একাত্তর', 'বাহাত্তর', 'তিয়াত্তর', 'চুয়াত্তর', 'পঁচাত্তর', 'ছেয়াত্তর', 'সাতাত্তর', 'আটাত্তর', 'ঊনআশি', 'আশি', 'একাশি', 'বিরাশি', 'তিরাশি', 'চুরাশি', 'পঁচাশি', 'ছেয়াশি', 'সাতাশি', 'আটাশি', 'ঊননব্বই', 'নব্বই', 'একানব্বই', 'বিরানব্বই', 'তিরানব্বই', 'চুরানব্বই', 'পঁচানব্বই', 'ছেয়ানব্বই', 'সাতানব্বই', 'আটানব্বই', 'নিরানব্বই'];
+  const bnNumbers = ['শূন্য', 'এক', 'দুই', 'তিন', 'চার', 'পাঁচ', 'ছয়', 'সাত', 'আট', 'নয়', 'দশ', 'এগারো', 'বারো', 'তেরো', 'চৌদ্দ', 'পনেরো', 'ষোলো', 'সতেরো', 'আঠারো', 'উনিশ', 'বিশ', 'একুশ', 'বাইশ', 'তেইশ', 'চৌত্রিশ', 'পঁয়ত্রিশ', 'ছত্রিশ', 'সাঁয়ত্রিশ', 'আটত্রিশ', 'ঊনচল্লিশ', 'চল্লিশ', 'একচল্লিশ', 'বয়াল্লিশ', 'তেতাল্লিশ', 'চুয়াল্লিশ', 'পঁয়তাল্লিশ', 'ছেচল্লিশ', 'সাতচল্লিশ', 'আটচল্লিশ', 'ঊনপঞ্চাশ', 'পঞ্চাশ', 'একান্ন', 'বায়ান্ন', 'তিপ্পান্ন', 'চুয়ান্ন', 'পঞ্চান্ন', 'ছাপ্পান্ন', 'সাতান্ন', 'আটান্ন', 'ঊনষাট', 'ষাট', 'একষট্টি', 'বাষট্টি', 'তেষাটি', 'চৌষট্টি', 'পঁয়ষট্টি', 'ছেষট্টি', 'সাতঘটি', 'আটষট্টি', 'ঊনসত্তর', 'সত্তর', 'একাত্তর', 'বাহাত্তর', 'তিয়াত্তর', 'চুয়াত্তর', 'পঁচাত্তর', 'ছেয়াত্তর', 'সাতাত্তর', 'আটাত্তর', 'ঊনআশি', 'আশি', 'একাশি', 'বিরাশি', 'তিরাশি', 'চুরাশি', 'পঁচাশি', 'ছেয়াশি', 'সাতাশি', 'আটাশি', 'ঊননব্বই', 'নব্বই', 'একানব্বই', 'বিরানব্বই', 'তিরানব্বই', 'চুরানব্বই', 'পঁচানব্বই', 'ছেয়ানব্বই', 'সাতানব্বই', 'আটানব্বই', 'নিরানব্বই'];
   if (num === 0) return bnNumbers[0];
   let output = '';
   const crore = Math.floor(num / 10000000);
@@ -252,10 +252,8 @@ const CashMemoPage: React.FC = () => {
       };
       
       if (editingMemoId) {
-        // If editing, update the existing document
         await updateDoc(doc(db, 'memos', editingMemoId), memoData);
       } else {
-        // If new, create a new document
         await addDoc(collection(db, 'memos'), memoData);
       }
     } catch (error) {
@@ -274,9 +272,7 @@ const CashMemoPage: React.FC = () => {
     const element = printRef.current;
     if (!element) return;
 
-    // Save/Update Data in Database
     await saveMemoToDatabase();
-
     await new Promise(r => setTimeout(r, 400));
 
     const opt = {
@@ -290,21 +286,13 @@ const CashMemoPage: React.FC = () => {
         textRendering: 'optimizeLegibility',
         backgroundColor: '#ffffff'
       },
-      jsPDF: { 
-        unit: 'mm', 
-        format: 'a4', 
-        orientation: 'portrait'
-      }
+      jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
     };
 
     try {
       await (window as any).html2pdf().from(element).set(opt).save();
-      // Only reset form after successful download
-      if (!editingMemoId) {
-        resetForm();
-      } else {
-        setEditingMemoId(null);
-      }
+      if (!editingMemoId) resetForm();
+      else setEditingMemoId(null);
     } catch (err) {
       console.error(err);
     } finally {
@@ -343,203 +331,82 @@ const CashMemoPage: React.FC = () => {
   );
 
   return (
-    <div className="space-y-8 animate-in fade-in duration-700 pb-20 max-w-6xl mx-auto">
+    <div className="space-y-6 md:space-y-8 animate-in fade-in duration-700 pb-20 max-w-6xl mx-auto px-2 sm:px-0">
       {/* 
-        A4 ONE-PAGE TEMPLATE 
+        PDF TEMPLATE (HIDDEN)
       */}
       <div style={{ position: 'absolute', left: '-9999px', top: '-9999px', overflow: 'hidden' }}>
         <div ref={printRef} className="w-[210mm] h-[297mm] bg-white text-slate-900 overflow-hidden flex flex-col" style={{ fontFamily: '"Noto Sans Bengali", "Inter", sans-serif' }}>
           <style>{`
-            .pdf-memo-container {
-              width: 100%;
-              height: 100%;
-              padding: 0;
-              margin: 0;
-              display: flex;
-              flex-direction: column;
-              text-rendering: optimizeLegibility;
-              font-variant-ligatures: normal;
-              font-feature-settings: "liga" on, "kern" on;
-            }
-            .pdf-memo-container * {
-              letter-spacing: 0 !important;
-              word-spacing: 0 !important;
-            }
-            .pdf-header {
-              background: #4f46e5;
-              color: white;
-              padding: 35px 50px;
-              display: flex;
-              justify-content: space-between;
-              align-items: center;
-              border-bottom: 6px solid #3730a3;
-            }
+            .pdf-memo-container { width: 100%; height: 100%; padding: 0; margin: 0; display: flex; flex-direction: column; text-rendering: optimizeLegibility; font-variant-ligatures: normal; font-feature-settings: "liga" on, "kern" on; }
+            .pdf-header { background: #4f46e5; color: white; padding: 35px 50px; display: flex; justify-content: space-between; align-items: center; border-bottom: 6px solid #3730a3; }
             .pdf-header h1 { font-size: 38px; font-weight: 900; margin: 0; line-height: 1.1; }
-            .pdf-header p { font-size: 13px; margin: 6px 0 0; font-weight: 600; opacity: 0.9; }
-            .pdf-memo-badge {
-              border: 1.5px solid rgba(255,255,255,0.4);
-              padding: 15px 30px;
-              border-radius: 12px;
-              text-align: right;
-            }
-            .pdf-customer-section {
-              padding: 25px 50px;
-              background: #f8fafc;
-              border-bottom: 1px solid #e2e8f0;
-              display: flex;
-              justify-content: space-between;
-              align-items: flex-start;
-            }
-            .pdf-label { font-size: 10px; font-weight: 800; color: #64748b; text-transform: uppercase; margin-bottom: 4px; }
-            .pdf-value { font-size: 16px; font-weight: 700; color: #0f172a; line-height: 1.2; }
-            .pdf-table-container {
-              flex: 1; /* This pushes the footer down */
-              padding: 30px 50px;
-              overflow: hidden;
-            }
+            .pdf-customer-section { padding: 25px 50px; background: #f8fafc; border-bottom: 1px solid #e2e8f0; display: flex; justify-content: space-between; align-items: flex-start; }
+            .pdf-table-container { flex: 1; padding: 30px 50px; overflow: hidden; }
             .pdf-table { width: 100%; border-collapse: collapse; }
             .pdf-table th { background: #1e293b; color: white; padding: 14px 15px; font-size: 13px; text-align: left; }
             .pdf-table td { padding: 14px 15px; border-bottom: 1px solid #f1f5f9; font-size: 15px; font-weight: 600; }
-            .pdf-footer-summary {
-              padding: 0 50px 40px;
-              display: flex;
-              justify-content: space-between;
-              align-items: flex-start;
-            }
-            .pdf-words-box { width: 55%; background: #f1f5f9; padding: 20px 25px; border-radius: 12px; font-size: 14px; font-weight: 700; color: #334155; }
             .pdf-total-box { width: 38%; background: #4f46e5; color: white; padding: 25px 30px; border-radius: 12px; text-align: right; }
-            .pdf-total-box h2 { font-size: 32px; font-weight: 900; margin: 0; }
-            .pdf-signature-area {
-              padding: 0 60px 50px;
-              display: flex;
-              justify-content: space-between;
-              align-items: flex-end;
-            }
-            .pdf-sig-line { width: 65mm; border-top: 2px solid #cbd5e1; text-align: center; padding-top: 10px; font-size: 13px; font-weight: 800; color: #64748b; }
-            .pdf-bottom-msg { padding: 20px; text-align: center; border-top: 1px solid #f1f5f9; font-size: 12px; font-weight: 700; color: #94a3b8; }
           `}</style>
-
           <div className="pdf-memo-container">
             <div className="pdf-header">
-              <div>
-                <h1>{t.subtitle}</h1>
-                <p>{t.address}</p>
-                <p>{t.phone}: {t.contact}</p>
-              </div>
-              <div className="pdf-memo-badge">
-                <h2 style={{margin:0, fontSize: '22px', fontWeight: 900}}>{t.title}</h2>
-                <p style={{margin:0, opacity:1}}>{t.date}: {date}</p>
-              </div>
+              <div><h1>{t.subtitle}</h1><p>{t.address}</p><p>{t.phone}: {t.contact}</p></div>
+              <div className="pdf-memo-badge"><h2>{t.title}</h2><p>{t.date}: {date}</p></div>
             </div>
-
             <div className="pdf-customer-section">
-              <div style={{width:'60%'}}>
-                <div className="pdf-label">{t.custInfo}</div>
-                <div className="pdf-value">{customerName || t.placeholderName}</div>
-                <div style={{marginTop:'8px'}}>
-                   <div className="pdf-label" style={{fontSize:'8px'}}>{t.clientAddress}</div>
-                   <div className="pdf-value" style={{fontSize:'12px', fontWeight:600}}>{customerAddress || 'N/A'}</div>
-                </div>
-              </div>
-              <div style={{textAlign:'right', width:'35%'}}>
-                <div className="pdf-label">{t.phone}</div>
-                <div className="pdf-value">{customerPhone || 'N/A'}</div>
-              </div>
+              <div style={{width:'60%'}}><div className="pdf-label">{t.custInfo}</div><div className="pdf-value">{customerName || t.placeholderName}</div><div style={{marginTop:'8px'}}><div className="pdf-label">{t.clientAddress}</div><div className="pdf-value">{customerAddress || 'N/A'}</div></div></div>
+              <div style={{textAlign:'right', width:'35%'}}><div className="pdf-label">{t.phone}</div><div className="pdf-value">{customerPhone || 'N/A'}</div></div>
             </div>
-
             <div className="pdf-table-container">
               <table className="pdf-table">
-                <thead>
-                  <tr>
-                    <th style={{width:'8%', textAlign:'center'}}>{t.sl}</th>
-                    <th style={{width:'50%'}}>{t.desc}</th>
-                    <th style={{width:'10%', textAlign:'center'}}>{t.qty}</th>
-                    <th style={{width:'16%', textAlign:'right'}}>{t.price}</th>
-                    <th style={{width:'16%', textAlign:'right'}}>{t.amount}</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.filter(i => i.name.trim() !== '' && i.price > 0).map((item, idx) => (
-                    <tr key={idx}>
-                      <td style={{textAlign:'center', color:'#94a3b8'}}>{idx + 1}</td>
-                      <td style={{color:'#0f172a'}}>{item.name}</td>
-                      <td style={{textAlign:'center'}}>{item.quantity}</td>
-                      <td style={{textAlign:'right'}}>{item.price.toLocaleString()}</td>
-                      <td style={{textAlign:'right', color:'#4f46e5', fontWeight: 900}}>
-                        {(item.quantity * item.price).toLocaleString()}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
+                <thead><tr><th>{t.sl}</th><th>{t.desc}</th><th>{t.qty}</th><th>{t.price}</th><th>{t.amount}</th></tr></thead>
+                <tbody>{items.filter(i => i.name.trim() !== '' && i.price > 0).map((item, idx) => (<tr key={idx}><td>{idx + 1}</td><td>{item.name}</td><td>{item.quantity}</td><td>{item.price.toLocaleString()}</td><td style={{color:'#4f46e5'}}>{(item.quantity * item.price).toLocaleString()}</td></tr>))}</tbody>
               </table>
             </div>
-
-            <div className="pdf-footer-summary">
-              <div className="pdf-words-box">
-                <div className="pdf-label" style={{color:'#4f46e5'}}>{t.amountInWords}</div>
-                <div style={{marginTop:'5px', fontStyle:'italic'}}>{amountInWordsText}</div>
-              </div>
-              <div className="pdf-total-box">
-                <div className="pdf-label" style={{color:'white', opacity:0.8}}>{t.grandTotal}</div>
-                <h2>৳{subtotal.toLocaleString()}/-</h2>
-              </div>
+            <div className="pdf-footer-summary" style={{padding: '0 50px 40px', display:'flex', justifyContent:'space-between'}}>
+              <div className="pdf-words-box" style={{width:'55%', background:'#f1f5f9', padding:'20px', borderRadius:'12px'}}><div className="pdf-label" style={{color:'#4f46e5'}}>{t.amountInWords}</div><div style={{fontStyle:'italic'}}>{amountInWordsText}</div></div>
+              <div className="pdf-total-box"><div>{t.grandTotal}</div><h2 style={{fontSize:'32px'}}>৳{subtotal.toLocaleString()}/-</h2></div>
             </div>
-
-            <div className="pdf-signature-area">
-              <div className="pdf-sig-line">{t.custSign}</div>
-              <div style={{textAlign:'right'}}>
-                <div style={{marginBottom:'20px', marginRight:'15px'}}>
-                  <div className="pdf-label" style={{color:'#4f46e5', marginBottom:0}}>{t.proprietor}</div>
-                  <div style={{fontSize:'20px', fontWeight:900, color:'#1e293b'}}>{t.owner}</div>
-                </div>
-                <div className="pdf-sig-line" style={{borderTopColor:'#4f46e5', color:'#4f46e5'}}>{t.authSign}</div>
-              </div>
-            </div>
-
-            <div className="pdf-bottom-msg">
-              {t.footerMsg}
-            </div>
+            <div className="pdf-signature-area" style={{padding:'0 60px 50px', display:'flex', justifyContent:'space-between'}}><div>{t.custSign}</div><div style={{textAlign:'right'}}><div>{t.proprietor}</div><div style={{fontSize:'20px', fontWeight:900}}>{t.owner}</div><div>{t.authSign}</div></div></div>
+            <div className="pdf-bottom-msg" style={{textAlign:'center', padding:'20px'}}>{t.footerMsg}</div>
           </div>
         </div>
       </div>
 
       {/* UI CONTROLS */}
-      <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
-        <div className="flex items-center space-x-6">
-          <div className="bg-indigo-600 p-5 rounded-[1.5rem] text-white shadow-xl shadow-indigo-100"><ShoppingBag size={28} /></div>
+      <div className="bg-white p-4 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="flex items-center space-x-4 md:space-x-6">
+          <div className="bg-indigo-600 p-3 md:p-5 rounded-[1rem] md:rounded-[1.5rem] text-white shadow-xl shadow-indigo-100"><ShoppingBag size={24} className="md:w-7 md:h-7" /></div>
           <div>
-            <h2 className="text-3xl font-black text-slate-900 tracking-tight">
-              {editingMemoId ? (language === 'bn' ? 'মেমো এডিট' : 'Edit Memo') : t.title}
-            </h2>
-            <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em]">{t.subtitle}</p>
+            <h2 className="text-xl md:text-3xl font-black text-slate-900 tracking-tight">{editingMemoId ? (language === 'bn' ? 'মেমো এডিট' : 'Edit Memo') : t.title}</h2>
+            <p className="text-[10px] md:text-xs text-slate-400 font-bold uppercase tracking-[0.2em]">{t.subtitle}</p>
           </div>
         </div>
         
-        <div className="flex items-center gap-4">
-          <div className="bg-slate-100 p-1.5 rounded-2xl flex items-center shadow-inner">
+        <div className="flex flex-wrap items-center gap-3 md:gap-4">
+          <div className="bg-slate-100 p-1 rounded-xl flex items-center shadow-inner">
              {['bn', 'en'].map(lang => (
-               <button key={lang} onClick={() => setLanguage(lang as Language)} className={`px-4 py-2 rounded-xl text-[10px] font-black uppercase tracking-widest transition-all ${language === lang ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-400'}`}>
+               <button key={lang} onClick={() => setLanguage(lang as Language)} className={`px-3 md:px-4 py-1.5 md:py-2 rounded-lg text-[9px] md:text-[10px] font-black uppercase tracking-widest transition-all ${language === lang ? 'bg-white text-indigo-600 shadow-md' : 'text-slate-400'}`}>
                  {lang === 'bn' ? 'বাংলা' : 'English'}
                </button>
              ))}
           </div>
-          <button onClick={resetForm} className="p-4 bg-slate-100 text-slate-400 hover:text-indigo-600 rounded-2xl transition-all" title={t.reset}><RefreshCcw size={20} /></button>
-          <button 
-            onClick={handlePrint} 
-            disabled={isProcessing} 
-            className={`${editingMemoId ? 'bg-emerald-600 shadow-emerald-100' : 'bg-indigo-600 shadow-indigo-100'} text-white px-8 py-4 rounded-2xl flex items-center space-x-3 hover:opacity-90 transition-all font-black shadow-xl active:scale-95 disabled:opacity-50`}
-          >
-            {isProcessing ? <Loader2 size={20} className="animate-spin" /> : (editingMemoId ? <Save size={20} /> : <Printer size={20} />)}
-            <span className="uppercase tracking-widest text-xs">{editingMemoId ? t.updateBtn : t.printBtn}</span>
-          </button>
+          <div className="flex items-center gap-2 flex-1 md:flex-none">
+            <button onClick={resetForm} className="p-3 md:p-4 bg-slate-100 text-slate-400 hover:text-indigo-600 rounded-xl md:rounded-2xl transition-all" title={t.reset}><RefreshCcw size={20} /></button>
+            <button onClick={handlePrint} disabled={isProcessing} className={`flex-1 md:flex-none ${editingMemoId ? 'bg-emerald-600 shadow-emerald-100' : 'bg-indigo-600 shadow-indigo-100'} text-white px-5 md:px-8 py-3 md:py-4 rounded-xl md:rounded-2xl flex items-center justify-center space-x-2 md:space-x-3 hover:opacity-90 transition-all font-black shadow-xl active:scale-95 disabled:opacity-50`}>
+              {isProcessing ? <Loader2 size={18} className="animate-spin" /> : (editingMemoId ? <Save size={18} /> : <Printer size={18} />)}
+              <span className="uppercase tracking-widest text-[10px] md:text-xs whitespace-nowrap">{editingMemoId ? t.updateBtn : t.printBtn}</span>
+            </button>
+          </div>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 md:gap-8">
+        {/* Left Column: Customer & Summary */}
         <div className="lg:col-span-4 space-y-6">
-          <div className={`bg-white p-8 rounded-[2.5rem] shadow-sm border ${editingMemoId ? 'border-emerald-200 ring-2 ring-emerald-500/10' : 'border-slate-100'} space-y-6`}>
+          <div className={`bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border ${editingMemoId ? 'border-emerald-200 ring-2 ring-emerald-500/10' : 'border-slate-100'} space-y-6`}>
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center">
+              <h3 className="text-xs md:text-sm font-black text-slate-900 uppercase tracking-widest flex items-center">
                 <User size={16} className={`mr-2 ${editingMemoId ? 'text-emerald-600' : 'text-indigo-600'}`} />
                 {t.custInfo}
               </h3>
@@ -547,73 +414,94 @@ const CashMemoPage: React.FC = () => {
             </div>
             <div className="space-y-4">
               <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">{t.clientName}</label>
+                <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">{t.clientName}</label>
                 <div className="relative">
                   <User className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
-                  <input type="text" placeholder={t.placeholderName} className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+                  <input type="text" placeholder={t.placeholderName} className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={customerName} onChange={(e) => setCustomerName(e.target.value)} />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-4">
+                <div>
+                  <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">{t.phone}</label>
+                  <div className="relative">
+                    <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
+                    <input type="text" placeholder="01XXX-XXXXXX" className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
+                  </div>
+                </div>
+                <div>
+                  <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">{t.date}</label>
+                  <div className="relative">
+                    <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
+                    <input type="date" className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={date} onChange={(e) => setDate(e.target.value)} />
+                  </div>
                 </div>
               </div>
               <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">{t.phone}</label>
-                <div className="relative">
-                  <Phone className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
-                  <input type="text" placeholder="01XXX-XXXXXX" className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={customerPhone} onChange={(e) => setCustomerPhone(e.target.value)} />
-                </div>
-              </div>
-              <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">{t.clientAddress}</label>
+                <label className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">{t.clientAddress}</label>
                 <div className="relative">
                   <MapPin className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
-                  <input type="text" placeholder={t.placeholderAddress} className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} />
-                </div>
-              </div>
-              <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">{t.date}</label>
-                <div className="relative">
-                  <Calendar className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
-                  <input type="date" className="w-full pl-11 pr-4 py-3.5 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={date} onChange={(e) => setDate(e.target.value)} />
+                  <input type="text" placeholder={t.placeholderAddress} className="w-full pl-11 pr-4 py-3 bg-slate-50 border border-slate-200 rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={customerAddress} onChange={(e) => setCustomerAddress(e.target.value)} />
                 </div>
               </div>
             </div>
           </div>
-          <div className="bg-slate-900 p-8 rounded-[2.5rem] shadow-xl text-white relative overflow-hidden">
-            <div className="absolute right-0 top-0 p-4 opacity-10"><Calculator size={80} /></div>
-            <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t.totalPayable}</p>
-            <h2 className="text-4xl font-black tracking-tighter text-indigo-400">৳{subtotal.toLocaleString()}</h2>
+          <div className="bg-slate-900 p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-xl text-white relative overflow-hidden">
+            <div className="absolute right-0 top-0 p-4 opacity-10"><Calculator size={80} className="w-16 h-16 md:w-20 md:h-20" /></div>
+            <p className="text-[9px] md:text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1">{t.totalPayable}</p>
+            <h2 className="text-3xl md:text-4xl font-black tracking-tighter text-indigo-400">৳{subtotal.toLocaleString()}</h2>
             <div className="h-px bg-white/10 w-full my-4"></div>
-            <p className="text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center"><CheckCircle2 size={12} className="mr-2 text-indigo-500" />{items.length} {t.itemsListed}</p>
+            <p className="text-[9px] md:text-[10px] font-bold text-slate-500 uppercase tracking-widest flex items-center"><CheckCircle2 size={12} className="mr-2 text-indigo-500" />{items.length} {t.itemsListed}</p>
           </div>
         </div>
 
+        {/* Right Column: Items List */}
         <div className="lg:col-span-8 space-y-6">
-          <div className="bg-white p-8 rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col h-full min-h-[500px]">
-            <div className="flex items-center justify-between mb-8">
-              <h3 className="text-sm font-black text-slate-900 uppercase tracking-widest flex items-center"><FileText size={16} className="mr-2 text-indigo-600" />{t.billingDetails}</h3>
-              <button onClick={addItem} className="flex items-center space-x-2 text-indigo-600 hover:text-indigo-700 font-black text-xs uppercase tracking-widest"><Plus size={16} /><span>{t.addProduct}</span></button>
+          <div className="bg-white p-6 md:p-8 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-slate-100 flex flex-col h-full min-h-[400px]">
+            <div className="flex items-center justify-between mb-6 md:mb-8">
+              <h3 className="text-xs md:text-sm font-black text-slate-900 uppercase tracking-widest flex items-center"><FileText size={16} className="mr-2 text-indigo-600" />{t.billingDetails}</h3>
+              <button onClick={addItem} className="flex items-center space-x-2 text-indigo-600 hover:text-indigo-700 font-black text-[10px] md:text-xs uppercase tracking-widest"><Plus size={16} /><span>{t.addProduct}</span></button>
             </div>
-            <div className="grid grid-cols-12 gap-4 mb-4 px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+            
+            {/* Table Header (Desktop Only) */}
+            <div className="hidden sm:grid grid-cols-12 gap-4 mb-4 px-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
               <div className="col-span-1 text-center">{t.sl}</div>
-              <div className="col-span-4">{t.desc}</div>
+              <div className="col-span-5">{t.desc}</div>
               <div className="col-span-2 text-center">{t.qty}</div>
               <div className="col-span-2 text-right">{t.price}</div>
               <div className="col-span-2 text-right">{t.amount}</div>
             </div>
-            <div className="flex-1 space-y-3">
+
+            <div className="flex-1 space-y-4 sm:space-y-3">
               {items.map((item, index) => (
-                <div key={item.id} className="grid grid-cols-12 gap-4 items-center">
-                  <div className="col-span-1 text-center font-black text-slate-300">{index + 1}</div>
-                  <div className="col-span-4">
-                    <input type="text" placeholder={t.placeholderProd} className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={item.name} onChange={(e) => updateItem(item.id, 'name', e.target.value)} />
-                  </div>
-                  <div className="col-span-2">
-                    <input type="number" className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-black text-center" value={item.quantity || ''} onChange={(e) => updateItem(item.id, 'quantity', Number(e.target.value))} />
-                  </div>
-                  <div className="col-span-2">
-                    <input type="number" className="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-black text-right" value={item.price || ''} onChange={(e) => updateItem(item.id, 'price', Number(e.target.value))} />
-                  </div>
-                  <div className="col-span-2 text-right font-black text-sm text-slate-600">{(item.quantity * item.price).toLocaleString()}</div>
-                  <div className="col-span-1 flex justify-center">
-                    <button onClick={() => removeItem(item.id)} disabled={items.length === 1} className="p-2 text-slate-300 hover:text-rose-500 disabled:opacity-0 transition-all"><Trash2 size={18} /></button>
+                <div key={item.id} className="relative bg-slate-50/50 sm:bg-transparent p-4 sm:p-0 rounded-2xl border sm:border-none border-slate-100">
+                  <div className="grid grid-cols-12 gap-2 md:gap-4 items-center">
+                    {/* SL Number */}
+                    <div className="hidden sm:block col-span-1 text-center font-black text-slate-300">{index + 1}</div>
+                    
+                    {/* Item Name */}
+                    <div className="col-span-12 sm:col-span-5">
+                      <div className="sm:hidden text-[9px] font-black text-slate-400 uppercase mb-1">{t.desc}</div>
+                      <input type="text" placeholder={t.placeholderProd} className="w-full px-4 py-2.5 md:py-3 bg-white sm:bg-slate-50 border border-slate-100 sm:border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={item.name} onChange={(e) => updateItem(item.id, 'name', e.target.value)} />
+                    </div>
+
+                    {/* Quantity & Price */}
+                    <div className="col-span-5 sm:col-span-2">
+                      <div className="sm:hidden text-[9px] font-black text-slate-400 uppercase mb-1">{t.qty}</div>
+                      <input type="number" onWheel={e => e.currentTarget.blur()} className="w-full px-2 sm:px-4 py-2.5 md:py-3 bg-white sm:bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-black text-center text-sm" value={item.quantity || ''} onChange={(e) => updateItem(item.id, 'quantity', Number(e.target.value))} />
+                    </div>
+                    <div className="col-span-7 sm:col-span-2">
+                      <div className="sm:hidden text-[9px] font-black text-slate-400 uppercase mb-1">{t.price}</div>
+                      <input type="number" onWheel={e => e.currentTarget.blur()} className="w-full px-2 sm:px-4 py-2.5 md:py-3 bg-white sm:bg-slate-50 border border-slate-100 rounded-xl outline-none focus:ring-2 focus:ring-indigo-500 font-black text-right text-sm" value={item.price || ''} onChange={(e) => updateItem(item.id, 'price', Number(e.target.value))} />
+                    </div>
+
+                    {/* Total & Action */}
+                    <div className="col-span-9 sm:col-span-2 text-right font-black text-sm text-slate-600 sm:pr-2 pt-2 sm:pt-0">
+                       <span className="sm:hidden text-[10px] font-bold text-slate-400 mr-2 uppercase">{t.amount}:</span>
+                       ৳{(item.quantity * item.price).toLocaleString()}
+                    </div>
+                    <div className="col-span-3 sm:col-span-1 flex justify-end pt-2 sm:pt-0">
+                      <button onClick={() => removeItem(item.id)} disabled={items.length === 1} className="p-2 text-slate-300 hover:text-rose-500 disabled:opacity-0 transition-all"><Trash2 size={18} /></button>
+                    </div>
                   </div>
                 </div>
               ))}
@@ -623,38 +511,30 @@ const CashMemoPage: React.FC = () => {
       </div>
 
       {/* MEMO HISTORY SECTION */}
-      <div className="bg-white p-10 rounded-[2.5rem] shadow-sm border border-slate-100 space-y-8">
+      <div className="bg-white p-6 md:p-10 rounded-[1.5rem] md:rounded-[2.5rem] shadow-sm border border-slate-100 space-y-6 md:space-y-8">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="flex items-center space-x-4">
-            <div className="bg-indigo-50 p-3 rounded-2xl text-indigo-600 shadow-inner">
-               <History size={24} />
-            </div>
+            <div className="bg-indigo-50 p-3 rounded-2xl text-indigo-600 shadow-inner"><History size={24} /></div>
             <div>
-               <h3 className="text-2xl font-black text-slate-900 tracking-tight">{t.historyTitle}</h3>
+               <h3 className="text-xl md:text-2xl font-black text-slate-900 tracking-tight">{t.historyTitle}</h3>
                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Recent Invoices</p>
             </div>
           </div>
           <div className="relative group max-w-md w-full">
-            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 transition-colors" size={18} />
-            <input 
-              type="text" 
-              placeholder={t.searchHistory} 
-              className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" 
-              value={historySearch} 
-              onChange={e => setHistorySearch(e.target.value)} 
-            />
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 transition-colors size={18}" />
+            <input type="text" placeholder={t.searchHistory} className="w-full pl-12 pr-4 py-3 bg-slate-50 border border-slate-100 rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={historySearch} onChange={e => setHistorySearch(e.target.value)} />
           </div>
         </div>
 
-        <div className="overflow-x-auto rounded-3xl border border-slate-50">
-          <table className="w-full text-left">
+        <div className="overflow-x-auto rounded-2xl md:rounded-3xl border border-slate-50">
+          <table className="w-full text-left min-w-[600px]">
             <thead>
               <tr className="bg-slate-50 text-[10px] font-black text-slate-400 uppercase tracking-widest border-b border-slate-100">
-                <th className="px-8 py-5 text-center w-16">{t.sl}</th>
-                <th className="px-8 py-5">{t.date}</th>
-                <th className="px-8 py-5">{t.clientName}</th>
-                <th className="px-8 py-5">{t.totalPayable}</th>
-                <th className="px-8 py-5 text-right">Actions</th>
+                <th className="px-6 md:px-8 py-5 text-center w-16">{t.sl}</th>
+                <th className="px-6 md:px-8 py-5">{t.date}</th>
+                <th className="px-6 md:px-8 py-5">{t.clientName}</th>
+                <th className="px-6 md:px-8 py-5">{t.totalPayable}</th>
+                <th className="px-6 md:px-8 py-5 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
@@ -663,15 +543,15 @@ const CashMemoPage: React.FC = () => {
               ) : filteredHistory.length > 0 ? (
                 filteredHistory.map((memo, index) => (
                   <tr key={memo.id} className={`hover:bg-slate-50/50 transition-colors group ${editingMemoId === memo.id ? 'bg-emerald-50' : ''}`}>
-                    <td className="px-8 py-5 text-center font-black text-slate-300 text-xs">{index + 1}</td>
-                    <td className="px-8 py-5 text-xs font-bold text-slate-500">{memo.date}</td>
-                    <td className="px-8 py-5">
+                    <td className="px-6 md:px-8 py-5 text-center font-black text-slate-300 text-xs">{index + 1}</td>
+                    <td className="px-6 md:px-8 py-5 text-xs font-bold text-slate-500">{memo.date}</td>
+                    <td className="px-6 md:px-8 py-5">
                        <p className="font-black text-slate-800 text-sm tracking-tight">{memo.customerName}</p>
                        <p className="text-[10px] text-slate-400 font-bold">{memo.customerPhone}</p>
                     </td>
-                    <td className="px-8 py-5"><span className="px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl font-black text-sm">৳{memo.subtotal.toLocaleString()}</span></td>
-                    <td className="px-8 py-5 text-right">
-                       <div className="flex items-center justify-end space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <td className="px-6 md:px-8 py-5"><span className="px-3 md:px-4 py-1.5 bg-indigo-50 text-indigo-600 rounded-xl font-black text-sm">৳{memo.subtotal.toLocaleString()}</span></td>
+                    <td className="px-6 md:px-8 py-5 text-right">
+                       <div className="flex items-center justify-end space-x-2 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                          <button onClick={() => loadMemoForEdit(memo)} title="Edit/Load Memo" className={`p-2.5 rounded-xl transition-all shadow-sm ${editingMemoId === memo.id ? 'text-white bg-emerald-600' : 'text-slate-400 hover:text-indigo-600 hover:bg-white'}`}><Edit2 size={18}/></button>
                          <button onClick={() => deleteMemo(memo.id)} title="Delete Memo" className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-white rounded-xl transition-all shadow-sm"><Trash2 size={18}/></button>
                        </div>
@@ -686,23 +566,31 @@ const CashMemoPage: React.FC = () => {
         </div>
       </div>
 
+      {/* CUSTOMER SELECTION MODAL */}
       {isSelectModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
           <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsSelectModalOpen(false)} />
           <div className="relative bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden flex flex-col max-h-[80vh]">
-            <div className="p-8 bg-indigo-600 flex items-center justify-between text-white">
+            <div className="p-6 md:p-8 bg-indigo-600 flex items-center justify-between text-white">
                <div className="flex items-center space-x-4">
-                  <div className="bg-white/20 p-3 rounded-2xl"><Users size={24} /></div>
-                  <h3 className="text-2xl font-black uppercase">{t.selectClient}</h3>
+                  <div className="bg-white/20 p-2 md:p-3 rounded-xl md:rounded-2xl"><Users size={24} /></div>
+                  <h3 className="text-xl md:text-2xl font-black uppercase">{t.selectClient}</h3>
                </div>
                <button onClick={() => setIsSelectModalOpen(false)}><X size={24} /></button>
             </div>
-            <div className="p-6 border-b"><div className="relative"><Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} /><input type="text" placeholder={t.searchClient} className="w-full pl-11 pr-4 py-3 bg-slate-50 border rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)} /></div></div>
+            <div className="p-4 md:p-6 border-b">
+              <div className="relative">
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
+                <input type="text" placeholder={t.searchClient} className="w-full pl-11 pr-4 py-3 bg-slate-50 border rounded-xl md:rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold text-sm" value={customerSearch} onChange={(e) => setCustomerSearch(e.target.value)} />
+              </div>
+            </div>
             <div className="flex-1 overflow-y-auto p-4 space-y-2">
-              {loadingCustomers ? <div className="py-20 text-center"><Loader2 size={32} className="animate-spin mx-auto text-indigo-500" /></div> : filteredCustomers.map(customer => (
+              {loadingCustomers ? (
+                <div className="py-20 text-center"><Loader2 size={32} className="animate-spin mx-auto text-indigo-500" /></div>
+              ) : filteredCustomers.map(customer => (
                 <button key={customer.id} onClick={() => { setCustomerName(customer.name); setCustomerPhone(customer.number); setCustomerAddress(customer.address); setIsSelectModalOpen(false); }} className="w-full flex items-center justify-between p-4 hover:bg-slate-50 rounded-2xl transition-all group">
                   <div className="flex items-center space-x-4">
-                    <img src={customer.imageUrl} className="w-10 h-10 rounded-xl border object-cover" alt="" />
+                    <img src={customer.imageUrl} className="w-10 h-10 rounded-xl border object-cover bg-slate-100" alt="" />
                     <div className="text-left">
                       <p className="font-black text-slate-800 text-sm">{customer.name}</p>
                       <p className="text-[10px] font-bold text-slate-400">{customer.number}</p>
