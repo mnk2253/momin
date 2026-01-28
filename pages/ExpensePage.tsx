@@ -39,9 +39,9 @@ const EXPENSE_CATEGORIES = [
   { id: 'Staff Salary', icon: <Briefcase size={16} /> },
   { id: 'Tea & Snacks', icon: <Coffee size={16} /> },
   { id: 'Shop Rent', icon: <ArrowDownCircle size={16} /> },
-  { id: 'Marketing', icon: <Tag size={16} /> },
+  { id: 'Baba', icon: <Tag size={16} /> },
   { id: 'Maintenance', icon: <Receipt size={16} /> },
-  { id: 'Others', icon: <Plus size={16} /> }
+  { id: 'Bazar', icon: <Plus size={16} /> }
 ];
 
 const ExpensePage: React.FC = () => {
