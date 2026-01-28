@@ -134,7 +134,7 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
           >
             <div className="hidden sm:block text-right">
               <p className="text-sm font-black text-slate-900 leading-none group-hover:text-indigo-600 transition-colors">
-                {currentUser?.displayName || 'Administrator'}
+                {currentUser?.displayName || 'Abdul Momin'}
               </p>
               <p className="text-[10px] text-slate-400 font-bold uppercase tracking-tighter mt-1">
                 {currentUser?.email}
