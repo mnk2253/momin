@@ -330,6 +330,12 @@ const CustomerDuePage: React.FC = () => {
     // Header Section
     doc.setFontSize(22); doc.setTextColor(79, 70, 229); doc.setFont("helvetica", "bold"); 
     doc.text("Sinthiya Telecom", 14, 20);
+
+    doc.setFontSize(10); doc.setTextColor(50); doc.setFont("helvetica", "bold"); 
+    doc.text("owner:Md. Abdul Momin", 14, 27);
+
+    doc.setFontSize(10); doc.setTextColor(50); doc.setFont("helvetica", "normal"); 
+    doc.text("Contact: 01307085310", 14, 27);
     
     doc.setFontSize(10); doc.setTextColor(50); doc.setFont("helvetica", "normal"); 
     doc.text("Sirajganj, Bangladesh", 14, 27);
@@ -379,7 +385,7 @@ const CustomerDuePage: React.FC = () => {
       styles: { fontSize: 9 }
     });
     
-    doc.save(`${customer.name}_ledger.pdf`);
+    doc.save(`${customer.name}_Due.pdf`);
   };
 
   const filteredCustomers = customers.filter(c => c.name.toLowerCase().includes(searchTerm.toLowerCase()) || c.number.includes(searchTerm));
