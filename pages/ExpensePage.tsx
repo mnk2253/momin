@@ -1,20 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
-  Plus,
-  Search,
-  Trash2,
-  Edit2,
-  Loader2,
-  Receipt,
-  X,
-  Tag,
-  ArrowDownCircle,
-  Coffee,
-  Lightbulb,
-  Wifi,
-  Briefcase,
-  TrendingDown,
-  Save
+  Plus, Search, Trash2, Edit2, Loader2,
+  X, TrendingDown, Save
 } from 'lucide-react';
 
 import {
@@ -32,21 +19,22 @@ import {
 import { Expense } from '../types';
 
 const EXPENSE_CATEGORIES = [
-  { id: 'Electricity' },
-  { id: 'Internet/Wifi' },
-  { id: 'Staff Salary' },
-  { id: 'Tea & Snacks' },
-  { id: 'Shop Rent' },
-  { id: 'Baba' },
-  { id: 'Maintenance' },
-  { id: 'Bazar' },
-  { id: 'Others' }
+  'Electricity',
+  'Internet/Wifi',
+  'Staff Salary',
+  'Tea & Snacks',
+  'Shop Rent',
+  'Baba',
+  'Maintenance',
+  'Bazar',
+  'Others'
 ];
 
 const ExpensePage: React.FC = () => {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedMonth, setSelectedMonth] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
 
@@ -61,6 +49,10 @@ const ExpensePage: React.FC = () => {
   });
 
   useEffect(() => {
+    setSelectedMonth(thisMonth);
+  }, []);
+
+  useEffect(() => {
     const q = query(collection(db, 'expenses'), orderBy('date', 'desc'));
     const unsub = onSnapshot(q, snap => {
       const data = snap.docs.map(d => ({
@@ -73,24 +65,30 @@ const ExpensePage: React.FC = () => {
     return () => unsub();
   }, []);
 
-  // ===== TOTAL CALCULATIONS =====
+  // ===== FILTERED BY MONTH =====
+  const monthFiltered = expenses.filter(e =>
+    selectedMonth ? e.date.startsWith(selectedMonth) : true
+  );
+
+  const filteredExpenses = monthFiltered.filter(e =>
+    e.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    e.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    e.date.includes(searchTerm)
+  );
+
+  // ===== TOTALS =====
   const todayTotal = expenses
     .filter(e => e.date === today)
     .reduce((s, e) => s + Number(e.amount || 0), 0);
 
-  const monthlyTotal = expenses
-    .filter(e => e.date.startsWith(thisMonth))
-    .reduce((s, e) => s + Number(e.amount || 0), 0);
-
-  const grandTotal = expenses.reduce(
+  const monthlyTotal = monthFiltered.reduce(
     (s, e) => s + Number(e.amount || 0),
     0
   );
 
-  const filteredExpenses = expenses.filter(e =>
-    e.category.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    e.description.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    e.date.includes(searchTerm)
+  const grandTotal = expenses.reduce(
+    (s, e) => s + Number(e.amount || 0),
+    0
   );
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -137,22 +135,16 @@ const ExpensePage: React.FC = () => {
           <div>
             <h2 className="text-3xl font-black">Expense Tracker</h2>
             <p className="text-xs text-slate-400 font-bold uppercase tracking-widest">
-              Shop Outgoings
+              Monthly Filter Enabled
             </p>
           </div>
         </div>
 
-        {/* TOTAL SUMMARY */}
+        {/* TOTALS */}
         <div className="flex gap-6 text-right">
           <div>
             <p className="text-[10px] text-slate-400 font-black uppercase">
-              Today
-            </p>
-            <p className="text-xl font-black">৳{todayTotal.toLocaleString()}</p>
-          </div>
-          <div>
-            <p className="text-[10px] text-slate-400 font-black uppercase">
-              This Month
+              Selected Month
             </p>
             <p className="text-xl font-black">
               ৳{monthlyTotal.toLocaleString()}
@@ -160,7 +152,15 @@ const ExpensePage: React.FC = () => {
           </div>
           <div>
             <p className="text-[10px] text-slate-400 font-black uppercase">
-              Total
+              Today
+            </p>
+            <p className="text-xl font-black">
+              ৳{todayTotal.toLocaleString()}
+            </p>
+          </div>
+          <div>
+            <p className="text-[10px] text-slate-400 font-black uppercase">
+              All Time
             </p>
             <p className="text-xl font-black text-rose-600">
               ৳{grandTotal.toLocaleString()}
@@ -171,22 +171,30 @@ const ExpensePage: React.FC = () => {
             onClick={() => setIsModalOpen(true)}
             className="bg-rose-600 text-white px-6 py-4 rounded-2xl font-black flex items-center gap-2"
           >
-            <Plus size={18} /> Add Expense
+            <Plus size={18} /> Add
           </button>
         </div>
       </div>
 
+      {/* FILTER BAR */}
+      <div className="flex gap-4">
+        <input
+          type="month"
+          value={selectedMonth}
+          onChange={e => setSelectedMonth(e.target.value)}
+          className="px-4 py-3 rounded-xl border bg-slate-50 font-bold"
+        />
+
+        <input
+          className="flex-1 px-4 py-3 rounded-xl border bg-slate-50"
+          placeholder="Search..."
+          value={searchTerm}
+          onChange={e => setSearchTerm(e.target.value)}
+        />
+      </div>
+
       {/* TABLE */}
       <div className="bg-white rounded-3xl border overflow-hidden">
-        <div className="p-6">
-          <input
-            className="w-full p-3 rounded-xl bg-slate-50 border"
-            placeholder="Search..."
-            value={searchTerm}
-            onChange={e => setSearchTerm(e.target.value)}
-          />
-        </div>
-
         <table className="w-full">
           <thead className="bg-slate-50">
             <tr>
@@ -206,7 +214,7 @@ const ExpensePage: React.FC = () => {
                 <td className="p-4 font-black text-rose-600">
                   ৳{e.amount.toLocaleString()}
                 </td>
-                <td className="p-4 text-right">
+                <td className="p-4 text-right space-x-2">
                   <button onClick={() => handleEditStart(e)}>
                     <Edit2 size={16} />
                   </button>
@@ -244,7 +252,7 @@ const ExpensePage: React.FC = () => {
               }
             >
               {EXPENSE_CATEGORIES.map(c => (
-                <option key={c.id}>{c.id}</option>
+                <option key={c}>{c}</option>
               ))}
             </select>
 
@@ -286,7 +294,6 @@ const ExpensePage: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setIsModalOpen(false)}
-                className="p-3"
               >
                 <X />
               </button>
