@@ -240,9 +240,9 @@ const Layout: React.FC<LayoutProps> = ({ children, onLogout }) => {
                    <div className="flex items-center justify-between p-4 bg-slate-50 rounded-2xl">
                       <div className="flex items-center space-x-2">
                          <Info size={14} className="text-indigo-500" />
-                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">System Version</span>
+                         <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Site Run 27.01.2026 </span>
                       </div>
-                      <span className="text-xs font-black text-indigo-600">v2.5.0-PRO</span>
+                      <span className="text-xs font-black text-indigo-600">Main Cash 117,868</span>
                    </div>
                 </div>
              </div>
