@@ -20,7 +20,8 @@ import {
   Save,
   RotateCcw,
   Hash,
-  Calculator
+  Calculator,
+  RefreshCw
 } from 'lucide-react';
 // Redirected modular imports to local wrappers in firebase.ts
 import { 
@@ -36,7 +37,8 @@ import {
   setDoc,
   getDocs,
   where,
-  db
+  db,
+  logActivity
 } from '../firebase';
 import { Product, StockTransaction, Carrier } from '../types';
 import { CARRIERS, CARRIER_LOGOS } from '../constants';
@@ -89,7 +91,7 @@ const StockManagement: React.FC = () => {
       setLoading(false);
     });
 
-    // Sync Transaction History (Recent 100)
+    // Sync Transaction History (Recent 150)
     const qHistory = query(collection(db, 'stock_history'), orderBy('createdAt', 'desc'), limit(150));
     const unsubHistory = onSnapshot(qHistory, (snapshot) => {
       const hData = snapshot.docs.map(doc => ({ ...doc.data(), id: doc.id })) as StockTransaction[];
@@ -185,6 +187,10 @@ const StockManagement: React.FC = () => {
         transaction.set(historyRef, historyData);
       });
 
+      // Log Activity
+      const actionLabel = txType === 'BUY' ? 'Added Stock' : 'Recorded Sale';
+      await logActivity(txType === 'BUY' ? 'ADD' : 'EDIT', 'Stock', `${actionLabel}: ${formState.carrier} ${formState.itemType} (${formState.quantity} Units @ ৳${formState.price})`);
+
       setIsModalOpen(false);
       setFormState({ ...formState, quantity: 0, price: 0, remarks: '' });
       setPhysicalEndStock('');
@@ -199,20 +205,35 @@ const StockManagement: React.FC = () => {
     if (!editingProduct) return;
 
     try {
-      const productRef = doc(db, 'products', editingProduct.id);
+      const newProductId = `${editFormState.carrier}_${editFormState.itemType}`.replace(/\s+/g, '_');
+      const oldProductId = editingProduct.id;
       const buyPrice = Number(editFormState.buyPrice) || 0;
+      const stock = Number(editFormState.stock) || 0;
+
       const updatedData = {
         slNumber: Number(editFormState.slNumber),
         carrier: editFormState.carrier,
         itemType: editFormState.itemType,
         name: `${editFormState.carrier} ${editFormState.itemType}`,
         buyPrice: buyPrice,
+        stock: stock,
         minStock: Number(editFormState.minStock),
         remarks: editFormState.remarks || '',
-        totalValue: (editingProduct.stock || 0) * buyPrice
+        totalValue: stock * buyPrice
       };
 
-      await updateDoc(productRef, updatedData);
+      if (newProductId !== oldProductId) {
+        // Handle ID Migration
+        await runTransaction(db, async (transaction) => {
+          transaction.set(doc(db, 'products', newProductId), updatedData);
+          transaction.delete(doc(db, 'products', oldProductId));
+        });
+        await logActivity('EDIT', 'Stock', `Migrated & Updated product: ${oldProductId} to ${newProductId}`);
+      } else {
+        await updateDoc(doc(db, 'products', oldProductId), updatedData);
+        await logActivity('EDIT', 'Stock', `Updated inventory data for ${editFormState.carrier} ${editFormState.itemType}`);
+      }
+      
       setIsEditModalOpen(false);
       setEditingProduct(null);
     } catch (err: any) {
@@ -222,9 +243,11 @@ const StockManagement: React.FC = () => {
   };
 
   const handleDeleteProduct = async (productId: string) => {
+    const product = products.find(p => p.id === productId);
     if (!window.confirm("Are you sure? This will remove the item from inventory but won't delete past history records.")) return;
     try {
       await deleteDoc(doc(db, 'products', productId));
+      await logActivity('DELETE', 'Stock', `Removed item from inventory: ${product?.name}`);
     } catch (err) {
       console.error(err);
       alert("Failed to delete product.");
@@ -275,6 +298,7 @@ const StockManagement: React.FC = () => {
 
         transaction.delete(doc(db, 'stock_history', historyItem.id));
       });
+      await logActivity('DELETE', 'Stock', `Deleted stock history entry and reverted units for ${historyItem.carrier} ${historyItem.itemType}`);
     } catch (err: any) {
       console.error(err);
       alert(err.message || "Failed to delete record.");
@@ -297,12 +321,14 @@ const StockManagement: React.FC = () => {
         let newStock = pData.stock || 0;
         let newBuyPrice = pData.buyPrice || 0;
 
+        // Revert old transaction quantity
         if (editingHistory.type === 'BUY') {
           newStock -= (editingHistory.quantity || 0);
         } else {
           newStock += (editingHistory.quantity || 0);
         }
 
+        // Apply new transaction quantity
         const newQty = Number(historyEditForm.quantity);
         const newPrice = Number(historyEditForm.pricePerUnit);
         if (editingHistory.type === 'BUY') {
@@ -312,7 +338,7 @@ const StockManagement: React.FC = () => {
           newStock -= newQty;
         }
 
-        if (newStock < 0) throw new Error("Negative stock result.");
+        if (newStock < 0) throw new Error("Insufficient stock for this change.");
 
         let profit = editingHistory.profit;
         if (editingHistory.type === 'SELL') {
@@ -335,6 +361,7 @@ const StockManagement: React.FC = () => {
         });
       });
 
+      await logActivity('EDIT', 'Stock', `Adjusted ledger entry for ${editingHistory.carrier} ${editingHistory.itemType}`);
       setIsHistoryEditModalOpen(false);
     } catch (err: any) {
       console.error(err);
@@ -349,6 +376,7 @@ const StockManagement: React.FC = () => {
       carrier: product.carrier,
       itemType: product.itemType,
       buyPrice: product.buyPrice,
+      stock: product.stock,
       minStock: product.minStock || 5,
       remarks: product.remarks || ''
     });
@@ -403,7 +431,7 @@ const StockManagement: React.FC = () => {
             </div>
             <div>
               <h2 className="text-3xl font-black text-slate-900 tracking-tight">Stock Management</h2>
-              <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em]">Inventory Hub v2.8</p>
+              <p className="text-xs text-slate-400 font-bold uppercase tracking-[0.2em]">Inventory Hub v3.0</p>
             </div>
           </div>
 
@@ -498,7 +526,7 @@ const StockManagement: React.FC = () => {
                       <td className="px-8 py-6 font-black text-indigo-600">৳{(p.totalValue || 0).toLocaleString()}</td>
                       <td className="px-8 py-6 text-right">
                          <div className="flex items-center justify-end space-x-2">
-                           <div className="flex items-center space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <div className="flex items-center space-x-1 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                              <button onClick={() => openEditModal(p)} className="p-2.5 text-slate-400 hover:text-indigo-600 hover:bg-indigo-50 rounded-xl transition-all"><Edit2 size={18} /></button>
                              <button onClick={() => handleDeleteProduct(p.id)} className="p-2.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-all"><Trash2 size={18} /></button>
                            </div>
@@ -592,7 +620,7 @@ const StockManagement: React.FC = () => {
                            {remStock} Units
                         </td>
                         <td className="px-8 py-5 text-right">
-                           <div className="flex items-center justify-end space-x-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                           <div className="flex items-center justify-end space-x-1 sm:opacity-0 group-hover:opacity-100 transition-opacity">
                               <button onClick={() => openHistoryEditModal(tx)} className="p-2 text-slate-400 hover:text-indigo-600 rounded-lg hover:bg-indigo-50 transition-all"><Edit2 size={16}/></button>
                               <button onClick={() => handleDeleteHistory(tx)} className="p-2 text-slate-400 hover:text-rose-600 rounded-lg hover:bg-rose-50 transition-all"><RotateCcw size={16}/></button>
                            </div>
@@ -712,6 +740,76 @@ const StockManagement: React.FC = () => {
         </div>
       )}
 
+      {/* Edit Inventory Item Modal */}
+      {isEditModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsEditModalOpen(false)} />
+          <div className="relative bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
+            <div className="p-8 bg-indigo-600 flex items-center justify-between text-white">
+               <div className="flex items-center space-x-4">
+                  <div className="bg-white/20 p-3 rounded-2xl"><Edit2 size={24} /></div>
+                  <div>
+                     <h3 className="text-2xl font-black tracking-tight uppercase leading-none">Edit Item Details</h3>
+                     <p className="text-[10px] font-bold uppercase tracking-widest opacity-70 mt-1.5">Inventory Master Data</p>
+                  </div>
+               </div>
+               <button onClick={() => setIsEditModalOpen(false)} className="bg-white/10 hover:bg-white/20 p-2 rounded-xl transition-all"><X size={24} /></button>
+            </div>
+
+            <form onSubmit={handleUpdateProduct} className="p-10 space-y-6 max-h-[80vh] overflow-y-auto">
+              <div>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Serial Number (SL)</label>
+                <div className="relative">
+                  <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
+                  <input required type="number" onWheel={e => e.currentTarget.blur()} className="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-black text-lg" value={editFormState.slNumber || ''} onChange={e => setEditFormState({...editFormState, slNumber: Number(e.target.value)})} />
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Carrier</label>
+                  <select className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold appearance-none cursor-pointer" value={editFormState.carrier} onChange={e => setEditFormState({...editFormState, carrier: e.target.value as Carrier})}>
+                    {CARRIERS.map(c => <option key={c} value={c}>{c}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Item Type</label>
+                  <select className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold appearance-none cursor-pointer" value={editFormState.itemType} onChange={e => setEditFormState({...editFormState, itemType: e.target.value})}>
+                    {ITEM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
+                  </select>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Buy Price (Market Cost)</label>
+                  <input required type="number" onWheel={e => e.currentTarget.blur()} className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-black text-lg" value={editFormState.buyPrice || ''} onChange={e => setEditFormState({...editFormState, buyPrice: Number(e.target.value)})} />
+                </div>
+                <div>
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Stock Correction</label>
+                  <input required type="number" onWheel={e => e.currentTarget.blur()} className="w-full px-6 py-4 bg-emerald-50 border border-emerald-100 rounded-2xl outline-none focus:ring-2 focus:ring-emerald-500 font-black text-lg" value={editFormState.stock || ''} onChange={e => setEditFormState({...editFormState, stock: Number(e.target.value)})} />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Min. Stock Alert</label>
+                <input required type="number" onWheel={e => e.currentTarget.blur()} className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-rose-500 font-black text-lg" value={editFormState.minStock || ''} onChange={e => setEditFormState({...editFormState, minStock: Number(e.target.value)})} />
+              </div>
+
+              <div>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Remarks / Note</label>
+                <textarea className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold h-24 resize-none" placeholder="Additional details..." value={editFormState.remarks} onChange={e => setEditFormState({...editFormState, remarks: e.target.value})} />
+              </div>
+
+              <button type="submit" className="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs flex items-center justify-center space-x-3 shadow-xl transition-all active:scale-[0.98]">
+                <Save size={18} />
+                <span>Save Changes</span>
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Edit History Ledger Modal */}
       {isHistoryEditModalOpen && (
         <div className="fixed inset-0 z-[60] flex items-center justify-center p-4 animate-in fade-in duration-200">
@@ -742,6 +840,11 @@ const StockManagement: React.FC = () => {
                 <input required type="date" className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold" value={historyEditForm.date} onChange={e => setHistoryEditForm({...historyEditForm, date: e.target.value})} />
               </div>
 
+              <div>
+                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Remarks</label>
+                <textarea className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold h-20 resize-none" value={historyEditForm.remarks} onChange={e => setHistoryEditForm({...historyEditForm, remarks: e.target.value})} />
+              </div>
+
               <div className="p-6 bg-slate-900 rounded-3xl text-center space-y-1 shadow-2xl relative overflow-hidden group">
                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-[0.3em]">New Total Flow</p>
                  <p className="text-3xl font-black text-white">৳{((Number(historyEditForm.quantity) || 0) * (Number(historyEditForm.pricePerUnit) || 0)).toLocaleString()}</p>
@@ -751,71 +854,6 @@ const StockManagement: React.FC = () => {
               <button type="submit" className="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs flex items-center justify-center space-x-3 shadow-xl transition-all active:scale-[0.98]">
                 <Save size={18} />
                 <span>Commit Ledger Change</span>
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* Edit Inventory Item Modal */}
-      {isEditModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-in fade-in duration-200">
-          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={() => setIsEditModalOpen(false)} />
-          <div className="relative bg-white w-full max-w-lg rounded-[2.5rem] shadow-2xl overflow-hidden border border-slate-100">
-            <div className="p-8 bg-indigo-600 flex items-center justify-between text-white">
-               <div className="flex items-center space-x-4">
-                  <div className="bg-white/20 p-3 rounded-2xl"><Edit2 size={24} /></div>
-                  <div>
-                     <h3 className="text-2xl font-black tracking-tight uppercase leading-none">Edit Item Details</h3>
-                     <p className="text-[10px] font-bold uppercase tracking-widest opacity-70 mt-1.5">Inventory Master Data</p>
-                  </div>
-               </div>
-               <button onClick={() => setIsEditModalOpen(false)} className="bg-white/10 hover:bg-white/20 p-2 rounded-xl transition-all"><X size={24} /></button>
-            </div>
-
-            <form onSubmit={handleUpdateProduct} className="p-10 space-y-6">
-              <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Serial Number (SL)</label>
-                <div className="relative">
-                  <Hash className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300" size={16} />
-                  <input required type="number" onWheel={e => e.currentTarget.blur()} className="w-full pl-10 pr-4 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-black text-lg" value={editFormState.slNumber || ''} onChange={e => setEditFormState({...editFormState, slNumber: Number(e.target.value)})} />
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Carrier</label>
-                  <select className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold appearance-none cursor-pointer" value={editFormState.carrier} onChange={e => setEditFormState({...editFormState, carrier: e.target.value as Carrier})}>
-                    {CARRIERS.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
-                </div>
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Item Type</label>
-                  <select className="w-full px-5 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold appearance-none cursor-pointer" value={editFormState.itemType} onChange={e => setEditFormState({...editFormState, itemType: e.target.value})}>
-                    {ITEM_TYPES.map(t => <option key={t} value={t}>{t}</option>)}
-                  </select>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Buy Price (Market Cost)</label>
-                  <input required type="number" onWheel={e => e.currentTarget.blur()} className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-black text-lg" value={editFormState.buyPrice || ''} onChange={e => setEditFormState({...editFormState, buyPrice: Number(e.target.value)})} />
-                </div>
-                <div>
-                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Min. Stock Alert</label>
-                  <input required type="number" onWheel={e => e.currentTarget.blur()} className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-rose-500 font-black text-lg" value={editFormState.minStock || ''} onChange={e => setEditFormState({...editFormState, minStock: Number(e.target.value)})} />
-                </div>
-              </div>
-
-              <div>
-                <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-1.5 block ml-1">Remarks / Note</label>
-                <textarea className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none focus:ring-2 focus:ring-indigo-500 font-bold h-24 resize-none" placeholder="Additional details..." value={editFormState.remarks} onChange={e => setEditFormState({...editFormState, remarks: e.target.value})} />
-              </div>
-
-              <button type="submit" className="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs flex items-center justify-center space-x-3 shadow-xl transition-all active:scale-[0.98]">
-                <Save size={18} />
-                <span>Save Changes</span>
               </button>
             </form>
           </div>
