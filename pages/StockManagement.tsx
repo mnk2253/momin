@@ -853,7 +853,7 @@ const StockManagement: React.FC = () => {
 
               <button type="submit" className="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-black uppercase tracking-widest text-xs flex items-center justify-center space-x-3 shadow-xl transition-all active:scale-[0.98]">
                 <Save size={18} />
-                <span>Commit Ledger Change</span>
+                <span>Commit  Change</span>
               </button>
             </form>
           </div>
